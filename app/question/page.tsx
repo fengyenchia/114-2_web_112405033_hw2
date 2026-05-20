@@ -1,71 +1,43 @@
 "use client"
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { usePsyStore } from "../../store/store";
 
+import ActionButton from '@/component/ActionButton';
+import { ProgressBar } from '@heroui/react';
 
-import Link from "next/link";
 
 export default function Question() {
 
+  const psyData = usePsyStore((state) => state.psyData);
+  const setPsyAnswer = usePsyStore((state) => state.setAnswer);
+
   const router = useRouter();
 
-  const questionData = [
-    {
-      "title": "麵包師傅要你「靜置 30 分鐘」，你會怎麼做？",
-      "options": [
-        {
-          text: "選項一：乖乖待著… 然後偷偷膨脹三倍大",
-          value: 1
-        },
-        {
-          text: "選項二：等個屁！我已經開始發酵狂飆了",
-          value: 2
-        },
-        {
-          text: "選項三：發…什麼？我忘記了，我睡著了",
-          value: 3
-        }]
-    },
-    {
-      "title": "當你被放進烤箱時，溫度突然升高，你的反應是？",
-      "options": [
-        {
-          text: "選項一：啊啊啊啊啊啊！（冒泡炸裂）",
-          value: 1
-        },
-        {
-          text: "選項二：熱熱熱快翻面！我要烤出最酥脆的皮！",
-          value: 2
-        },
-        {
-          text: "選項三：我已經放棄掙扎，來吧命運……",
-          value: 3
-        }]
-    },
-    {
-      "title": "如果你被顧客挑選時被放回去了，你會？",
-      "options": [
-        {
-          text: "選項一：立刻乾癟五公分，氣到扁掉",
-          value: 1
-        },
-        {
-          text: "選項二：更用力散發麵包香，讓他後悔！",
-          value: 2
-        },
-        {
-          text: "選項三：裝死，假裝自己是牛角麵包",
-          value: 3
-        }]
-    },
-  ];
 
+  // 把 quizData, score 從 store 中取出來
+  // console.log(psyData);
+  const quizData = psyData.quizData;
+  const score = psyData.score;
 
   const [questionIndex, setQuestionIndex] = useState(0);
+  const questionPercent = ((questionIndex + 1) / quizData.length) * 100;
+  const [warning, setWarning] = useState("");
+
+
+  useEffect(() => {
+    console.log("目前分數：" + score);
+  }, [score]);
+
   function nextQuestion(optionIndex: number) {
     console.log("使用者選擇：" + optionIndex);
+    // update store with selected answer (handles RGB sums and score delta)
+    setPsyAnswer(questionIndex, optionIndex);
+    setWarning("");
+    console.log("score after select:", psyData.score);
     
-    if(questionIndex == questionData.length-1) {
+    
+    if(questionIndex == quizData.length-1) {
       console.log("答題結束準備看結果");
       router.push("/prepare");
     }
@@ -73,26 +45,80 @@ export default function Question() {
       console.log("下一題");
       setQuestionIndex(questionIndex + 1);
     }
+
+  }
+  
+  function prevQuestionButton() {
+    if (questionIndex > 0) {
+      setQuestionIndex(questionIndex - 1);
+    }
+    setWarning("");
   }
 
-  
+  function nextQuestionButton() {
+    if (psyData.answers[questionIndex] === null) {
+      setWarning("請先選擇答案再進入下一題。");
+      return;
+    }
+
+    if (questionIndex == quizData.length - 1) {
+      router.push("/prepare");
+    } else {
+      setQuestionIndex(questionIndex + 1);
+    }
+
+  }
+
   return (
     <>
-    
     <div className="flex flex-col justify-center items-center gap-4">
-        <div>答題</div>
-        <div>
-          <div>{"Q" + (questionIndex + 1) + "：" + questionData[questionIndex].title}</div>
+        <ProgressBar value={questionPercent} className="progress-bar--sm">
+          {/* <Label>第 {questionIndex + 1} 題</Label> */}
+          {/* <ProgressBar.Output /> */}
+          <ProgressBar.Track className="bg-[#fcf8fb]">
+            <ProgressBar.Fill className="bg-[#f8ddf3]"/>
+          </ProgressBar.Track>
+        </ProgressBar>
+        
+        <div className="font-bold text-gray-600 text-xl">{ quizData[questionIndex].mainTitle }</div>
+        <div className="text-gray-600 text-center">
+          <div className="font-bold">{quizData[questionIndex].title}</div>
+
           {/* 帶參數 */}
-          <div onClick={ () => nextQuestion(0)} className="bg-white/50 p-2 rounded-lg mt-2 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{questionData[questionIndex].options[0].text}</div>
-          <div onClick={ () => nextQuestion(1)} className="bg-white/50 p-2 rounded-lg mt-2 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{questionData[questionIndex].options[1].text}</div>
-          <div onClick={ () => nextQuestion(2)} className="bg-white/50 p-2 rounded-lg mt-2 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{questionData[questionIndex].options[2].text}</div>
+          {/* <div onClick={ () => nextQuestion(0)} className="bg-white/50 p-2 rounded-lg mt-4 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{quizData[questionIndex].options[0].text}</div>
+          <div onClick={ () => nextQuestion(1)} className="bg-white/50 p-2 rounded-lg mt-4 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{quizData[questionIndex].options[1].text}</div>
+          <div onClick={ () => nextQuestion(2)} className="bg-white/50 p-2 rounded-lg mt-4 border border-white/50 hover:bg-gray-200 transition-all hover:border hover:border-gray-300 duration-300">{quizData[questionIndex].options[2].text}</div> */}
+
+          {
+            quizData[questionIndex].options.map(
+              (option: { text: string, color?: number[] }, index: number) => {
+                  const selected = psyData.answers && psyData.answers[questionIndex] === index;
+                  const selectedClass = selected ? 'shadow-lg scale-101' : '';
+
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => nextQuestion(index)}
+                      aria-pressed={selected}
+                      className={`w-full p-2 text-sm md:text-md rounded-lg mt-4 border border-transparent transition-all duration-500 ${selected ? 'bg-gray-700 text-white' : 'bg-white/50 text-gray-700 hover:border hover:border-gray-300'} ${selectedClass}`}
+                    >
+                      { option.text }
+                    </button>
+                  )
+                }
+              )
+            }
         </div>
 
-        <Link href="/prepare" className="text-white font-bold bg-gray-400 px-3 py-2 rounded-md">選項</Link>
+
+        {warning && <div className="text-xs font-bold text-red-700">{warning}</div>}
+        <div className="w-full flex justify-evenly mt-4">
+          <ActionButton text="上一題" onClick={prevQuestionButton} disabled={questionIndex === 0} />
+          <ActionButton text="下一題" onClick={nextQuestionButton} disabled={questionIndex === quizData.length - 1} />
+        </div>
 
     </div>
-
 
 
     </>
