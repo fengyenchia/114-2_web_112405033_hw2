@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import BgMusic from '@/component/BgMusic';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,8 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      {/* 背景音樂按鈕會固定在右上角，且切換頁面時音樂不中斷 */}
+      <BgMusic />
       <body className="custom-scrollbar min-h-full h-full relative flex flex-col bg-[url(/images/bg3.png)] bg-cover bg-center bg-no-repeat overflow-y-scroll">
       <div className="z-100 custom-scrollbar max-w-160 w-full h-screen mx-auto my-auto px-6 sm:px-10 py-12 lg:py-8 md:my-12 bg-white/10 flex flex-col justify-center rounded-lg shadow-lg hover:scale-101 transition-all duration-500 overflow-y-scroll">
         {children}
