@@ -11,7 +11,7 @@ export default function Prepare() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/result");
-    }, 2500);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -20,7 +20,7 @@ export default function Prepare() {
     <>      
     <div className="flex flex-col justify-center items-center gap-4">
 
-<div className="mainTitle">正在調配你的靈魂色票...</div>
+<div className="mainTitle animate-upAndDown">正在調配你的靈魂色票...</div>
       <ProgressBar isIndeterminate className="w-full max-w-xs">
         {/* <Label>正在調配你的靈魂色票...</Label> */}
         <ProgressBar.Track className="bg-[#fcf8fb]">
