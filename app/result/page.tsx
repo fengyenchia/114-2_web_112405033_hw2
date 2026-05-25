@@ -136,7 +136,7 @@ export default function Result() {
                             {/* 標籤 */}
                             <div data-tags="desktop" className="hidden md:flex w-full mt-4 gap-4 flex-wrap justify-start items-center">
                                 {payload.tags.map((t: string, i: number) => (
-                                  <span key={i} data-capture-chip="true" className="leading-none flex justify-center items-center text-xs bg-white/50 hover:bg-black hover:text-white transition-all duration-500 px-3 py-2 text-gray-700 border border-gray-700">{t}</span>
+                                  <span key={i} data-capture-chip="true" className="leading-none flex justify-center items-center text-xs bg-white/50 hover:bg-gray-700 hover:text-white transition-all duration-500 px-3 py-2 text-gray-700 border border-gray-700">{t}</span>
                                 ))}
                             </div>
                           </div>
